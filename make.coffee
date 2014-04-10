@@ -13,7 +13,7 @@ reload = -> station?.reload project
 target.cirru = ->
   file = 'cirru/index.cirru'
   render = renderer (cat file), '@filename': file
-  html = render().to 'index.html'
+  html = render()
   fs.writeFile 'index.html', html, 'utf8', (err) ->
     console.log 'done: cirru'
     do reload
