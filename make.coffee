@@ -22,7 +22,7 @@ target.cirru = ->
     console.log 'done: cirru'
     do reload
 
-target.browserify = ->
+targetBrowserify = ->
   b = browserify ['./js/main']
   build = fs.createWriteStream 'build/build.js', 'utf8'
   bundle = b.bundle(debug: yes)
@@ -35,19 +35,20 @@ target.js = ->
   exec 'coffee -o js/ -bc coffee/'
 
 target.coffee = (name, callback) ->
-  exec "coffee -o js/ -bc #{name}", ->
+  exec "coffee -o js/ -bc coffee/#{name}", ->
     console.log "done: coffee, compiled coffee/#{name}"
-    callback?()
+    do callback
 
 target.compile = ->
   target.cirru()
-  target.browserify()
+  targetBrowserify()
 
 target.watch = ->
   fs.watch 'cirru/', interval, target.cirru
   fs.watch 'coffee/', interval, (type, name) ->
     if type is 'change'
-      target.coffee name, target.browserify
+      target.coffee name, ->
+        do targetBrowserify
 
   station = require 'devtools-reloader-station'
   station.start()
