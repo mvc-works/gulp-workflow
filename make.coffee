@@ -10,6 +10,10 @@ browserify = require 'browserify'
 
 reload = -> station?.reload project
 
+target.folder = ->
+  mkdir '-p', 'cirru', 'coffee', 'js', 'build', 'css'
+  exec 'touch cirru/main.coffee css/style.css README.md'
+
 target.cirru = ->
   file = 'cirru/index.cirru'
   render = renderer (cat file), '@filename': file
