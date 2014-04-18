@@ -17,7 +17,9 @@ compileCoffee = (name, callback) ->
  
 target.folder = ->
   mkdir '-p', 'cirru', 'coffee', 'js', 'build', 'css'
-  exec 'touch cirru/main.coffee css/style.css README.md'
+  exec 'touch cirru/index.cirru css/style.css'
+  exec 'touch coffee/main.coffee'
+  exec 'touch README.md .gitignore .npmignore'
  
 target.cirru = ->
   file = 'cirru/index.cirru'
