@@ -1,15 +1,18 @@
 
-project = 'repo/window-lattice'
+project = 'repo/cirru/editor'
 station = undefined
 interval = interval: 300
- 
+
 require 'shelljs/make'
-fs = require 'fs'
 browserify = require 'browserify'
 {renderer} = require 'cirru-html'
  
-reload = -> station?.reload project
+fs = require 'fs'
 
+startTime = (new Date).getTime()
+ 
+reload = -> station?.reload project
+ 
 compileCoffee = (name, callback) ->
   exec "coffee -o js/ -bc coffee/#{name}", ->
     console.log "done: coffee, compiled coffee/#{name}"
@@ -52,7 +55,11 @@ target.watch = ->
     if type is 'change'
       compileCoffee name, ->
         do targetBrowserify
- 
+  
   station = require 'devtools-reloader-station'
   station.start()
-  console.log 'start watching'
+
+process.on 'exit', ->
+  now = (new Date).getTime()
+  duration = (now - startTime) / 1000
+  console.log "\nfinished in #{duration}s"
