@@ -1,3 +1,4 @@
+#!/usr/bin/env coffee
 
 project = 'repo/cirru/light-editor'
 interval = interval: 300
