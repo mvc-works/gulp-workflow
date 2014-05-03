@@ -1,15 +1,21 @@
 #!/usr/bin/env coffee
 
-project = 'repo/cirru/light-editor'
+project = 'repo/article/10-her-OS-1'
 interval = interval: 300
 watch = no
 
 require 'shelljs/make'
 fs = require 'fs'
+path = require 'path'
 station = require 'devtools-reloader-station'
 browserify = require 'browserify'
 exorcist = require 'exorcist'
-{renderer} = require 'cirru-html'
+
+{render, setResolver} = require 'cirru-html'
+setResolver (basePath, child, scope) ->
+  dest = path.join (path.dirname basePath), child
+  scope?['@filename'] = dest
+  cat dest
 
 startTime = (new Date).getTime()
 process.on 'exit', ->
@@ -18,12 +24,12 @@ process.on 'exit', ->
   console.log "\nfinished in #{duration}s"
 
 reload = -> station.reload project if watch
- 
+
 compileCoffee = (name, callback) ->
   exec "coffee -o js/ -bc coffee/#{name}", ->
     console.log "done: coffee, compiled coffee/#{name}"
     do callback
- 
+
 packJS = ->
   bundle = browserify ['./js/main']
   .bundle debug: yes
@@ -38,23 +44,22 @@ target.folder = ->
   exec 'touch cirru/index.cirru css/style.css'
   exec 'touch coffee/main.coffee'
   exec 'touch README.md .gitignore .npmignore'
- 
+
 target.cirru = ->
   file = 'cirru/index.cirru'
-  render = renderer (cat file), '@filename': file
-  html = render()
-  fs.writeFile 'index.html', html, 'utf8', (err) ->
-    console.log 'done: cirru'
-    do reload
+  html = render (cat file), '@filename': file
+  html.to 'index.html'
+  console.log 'done: cirru'
+  do reload
 
 target.js = ->
   exec 'coffee -o js/ -bc coffee/'
- 
+
 target.compile = ->
   target.cirru()
   exec 'coffee -o js/ -bc coffee/', ->
     packJS()
- 
+
 target.watch = ->
   watch = yes
   fs.watch 'cirru/', interval, target.cirru
@@ -62,5 +67,5 @@ target.watch = ->
     if type is 'change'
       compileCoffee name, ->
         do packJS
-  
+
   station.start()
