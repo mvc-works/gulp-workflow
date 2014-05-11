@@ -64,3 +64,17 @@ target.pre = ->
     file: 'package.json'
     options:
       at: 'prerelease'
+      target.sync = ->
+
+target.sync = ->
+  mission.rsync
+    file: './'
+    options:
+      dest: 'tiye:~/repo/topics.tiye.me/'
+      exclude: [
+        'node_modules/'
+        'coffee'
+        'README.md'
+        'coffee'
+        'js'
+      ]
