@@ -58,15 +58,14 @@ target.watch = ->
           browserify ->
             station.reload project
 
-target.pre = ->
+target.patch = ->
   target.compile()
   mission.bump
     file: 'package.json'
     options:
-      at: 'prerelease'
-      target.sync = ->
+      at: 'patch'
 
-target.sync = ->
+target.rsync = ->
   mission.rsync
     file: './'
     options:
@@ -75,6 +74,5 @@ target.sync = ->
         'node_modules/'
         'coffee'
         'README.md'
-        'coffee'
         'js'
       ]
