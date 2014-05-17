@@ -68,8 +68,8 @@ target.patch = ->
 target.rsync = ->
   mission.rsync
     file: './'
+    dest: 'tiye:~/repo/blog/'
     options:
-      dest: 'tiye:~/repo/topics.tiye.me/'
       exclude: [
         'node_modules/'
         'coffee'
