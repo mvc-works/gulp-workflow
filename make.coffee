@@ -72,7 +72,9 @@ target.rsync = ->
     options:
       exclude: [
         'node_modules/'
+        'bower_components/'
         'coffee'
         'README.md'
         'js'
+        '.git/'
       ]
