@@ -1,5 +1,5 @@
 #!/usr/bin/env coffee
-project = 'repo/todolist'
+project = 'repo/apus-forum'
 
 require 'shelljs/make'
 path = require 'path'
@@ -23,19 +23,29 @@ target.coffee = ->
     options:
       bare: yes
 
-cirru = ->
-  mission.cirru
-    file: 'index.cirru', from: 'cirru/', to: './', extname: '.html'
+cirru = (data) ->
+  mission.cirruHtml
+    file: 'index.cirru'
+    from: 'cirru/'
+    to: './'
+    extname: '.html'
+    data: data
 
 browserify = (callback) ->
   mission.browserify
     file: 'main.js', from: 'js/', to: 'build/', done: callback
 
-target.cirru = -> cirru()
+target.cirru = -> cirru inDev: yes
+target.cirruBuild = -> cirru inBuild: yes
 target.browserify = -> browserify()
 
 target.compile = ->
-  cirru()
+  cirru inDev: yes
+  target.coffee yes
+  browserify()
+
+target.build = ->
+  cirru inBuild: yes
   target.coffee yes
   browserify()
 
@@ -66,9 +76,10 @@ target.patch = ->
       at: 'patch'
 
 target.rsync = ->
+  target.build()
   mission.rsync
     file: './'
-    dest: 'tiye:~/repo/blog/'
+    dest: 'tiye:~/repo/apus-forum'
     options:
       exclude: [
         'node_modules/'
@@ -77,4 +88,5 @@ target.rsync = ->
         'README.md'
         'js'
         '.git/'
+        'png/*.jpg'
       ]
