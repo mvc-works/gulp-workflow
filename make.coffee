@@ -1,5 +1,5 @@
 #!/usr/bin/env coffee
-project = 'repo/apus-forum'
+project = 'apus-forum'
 
 require 'shelljs/make'
 path = require 'path'
@@ -15,7 +15,10 @@ target.folder = ->
     build: {}
     cirru: {'index.cirru': ''}
     coffee: {'main.coffee': ''}
-    css: {'style.css': ''}
+    css:
+      'style.css': ''
+      'dev.css': ''
+      'build.css': ''
 
 target.coffee = ->
   mission.coffee
@@ -39,7 +42,7 @@ target.cirru = -> cirru inDev: yes
 target.cirruBuild = -> cirru inBuild: yes
 target.browserify = -> browserify()
 
-target.compile = ->
+target.dev = ->
   cirru inDev: yes
   target.coffee yes
   browserify()
@@ -57,8 +60,8 @@ target.watch = ->
     trigger: (filepath, extname) ->
       switch extname
         when '.cirru'
-          cirru()
-          station.reload project
+          cirru inDev: yes
+          station.reload "repo/ #{project}"
         when '.coffee'
           filepath = path.relative 'coffee/', filepath
           mission.coffee
@@ -69,7 +72,6 @@ target.watch = ->
             station.reload project
 
 target.patch = ->
-  target.compile()
   mission.bump
     file: 'package.json'
     options:
@@ -79,7 +81,7 @@ target.rsync = ->
   target.build()
   mission.rsync
     file: './'
-    dest: 'tiye:~/repo/apus-forum'
+    dest: "tiye:~/repo/#{project}"
     options:
       exclude: [
         'node_modules/'
