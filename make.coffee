@@ -1,5 +1,5 @@
 #!/usr/bin/env coffee
-project = 'apus-forum'
+project = 'her-files'
 
 require 'shelljs/make'
 path = require 'path'
@@ -36,20 +36,33 @@ cirru = (data) ->
 
 browserify = (callback) ->
   mission.browserify
-    file: 'main.js', from: 'js/', to: 'build/', done: callback
+    file: 'main.js'
+    from: 'js/'
+    to: 'build/'
+    done: callback
+    options:
+      external: ['react', 'react-router']
+
+browserifyVender = ->
+  mission.browserifyVender
+    files: ['react', 'react-router']
+    to: 'build/vender.js'
 
 target.cirru = -> cirru inDev: yes
 target.cirruBuild = -> cirru inBuild: yes
 target.browserify = -> browserify()
+target.browserifyVender = -> browserifyVender()
 
 target.dev = ->
   cirru inDev: yes
   target.coffee yes
+  browserifyVender()
   browserify()
 
 target.build = ->
   cirru inBuild: yes
   target.coffee yes
+  browserifyVender()
   browserify()
 
 target.watch = ->
