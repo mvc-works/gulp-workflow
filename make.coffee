@@ -6,6 +6,7 @@ path = require 'path'
 mission = require 'mission'
 
 mission.time()
+console.log 'mk is deprecated, use gulpfile.coffee instead'
 
 target.folder = ->
   mission.tree
