@@ -1,31 +1,17 @@
 
 gulp = require 'gulp'
-filetree = require 'make-filetree'
-watch = require 'gulp-watch'
-html = require 'gulp-cirru-html'
-reloader = require 'gulp-reloader'
-coffee = require 'gulp-coffee'
-browserify = require 'browserify'
-source = require 'vinyl-source-stream'
-buffer = require 'vinyl-buffer'
-plumber = require 'gulp-plumber'
-rsync = require('rsyncwrapper').rsync
-uglify = require 'gulp-uglify'
 rename = require 'gulp-rename'
 sequence = require 'run-sequence'
-prefixer = require 'gulp-autoprefixer'
-cssmin = require 'gulp-cssmin'
-rimraf = require 'gulp-rimraf'
-transform = require 'vinyl-transform'
-wait = require 'gulp-wait'
 
 project = 'jiyinyiyong/simple-chat/index.html'
 dev = yes
 libraries = [
   'react'
+  'ws-json-browser'
 ]
 
 gulp.task 'folder', ->
+  filetree = require 'make-filetree'
   filetree.make '.',
     coffee:
       'main.coffee': ''
@@ -37,6 +23,13 @@ gulp.task 'folder', ->
     build: {}
 
 gulp.task 'watch', ->
+  plumber = require 'gulp-plumber'
+  coffee = require 'gulp-coffee'
+  reloader = require 'gulp-reloader'
+  watch = require 'gulp-watch'
+  html = require 'gulp-cirru-html'
+  transform = require 'vinyl-transform'
+  browserify = require 'browserify'
   reloader.listen()
 
   gulp
@@ -47,13 +40,13 @@ gulp.task 'watch', ->
   .pipe gulp.dest('./')
   .pipe reloader(project)
 
-  watch glob: 'coffee/**/*.coffee', (files) ->
+  watch glob: 'coffee/**/*.coffee', emitOnGlob: no, (files) ->
     files
     .pipe plumber()
     .pipe (coffee bare: yes)
     .pipe (gulp.dest 'build/js/')
 
-  watch glob: 'build/js/**/*.js', (files) ->
+  watch glob: 'build/js/**/*.js', emitOnGlob: no, (files) ->
     gulp
     .src './build/js/main.js'
     .pipe plumber()
@@ -65,12 +58,15 @@ gulp.task 'watch', ->
     .pipe reloader(project)
     return files
 
-  watch ['server.coffee', 'src/**/*.coffee'], (files) ->
+  watch glob: ['server.coffee', 'src/**/*.coffee'], emitOnGlob: no, (files) ->
+    wait = require 'gulp-wait'
     files
     .pipe wait(800)
     .pipe reloader(project)
 
 gulp.task 'js', ->
+  browserify = require 'browserify'
+  source = require 'vinyl-source-stream'
   b = browserify debug: dev
   b.add './build/js/main'
   b.external library for library in libraries
@@ -79,18 +75,24 @@ gulp.task 'js', ->
   .pipe gulp.dest('build/')
 
 gulp.task 'coffee', ->
+  coffee = require 'gulp-coffee'
   gulp
   .src 'coffee/**/*.coffee', base: 'coffee/'
   .pipe (coffee bare: yes)
   .pipe (gulp.dest 'build/js/')
 
 gulp.task 'html', ->
+  html = require 'gulp-cirru-html'
   gulp
   .src 'cirru/*'
   .pipe html(data: {dev: dev})
   .pipe gulp.dest('.')
 
 gulp.task 'jsmin', ->
+  source = require 'vinyl-source-stream'
+  uglify = require 'gulp-uglify'
+  buffer = require 'vinyl-buffer'
+  browserify = require 'browserify'
   b = browserify debug: no
   b.add './build/js/main'
   b.external library for library in libraries
@@ -101,21 +103,32 @@ gulp.task 'jsmin', ->
   .pipe gulp.dest('dist/')
 
 gulp.task 'vendor', ->
+  source = require 'vinyl-source-stream'
+  uglify = require 'gulp-uglify'
+  buffer = require 'vinyl-buffer'
+  browserify = require 'browserify'
   b = browserify debug: no
   b.require library for library in libraries
-  b.bundle()
+  jsbuffer = b.bundle()
   .pipe source('vendor.min.js')
   .pipe buffer()
-  .pipe uglify()
-  .pipe gulp.dest('dist/')
+  if dev
+    jsbuffer
+    .pipe gulp.dest('dist/')
+  else
+    jsbuffer
+    .pipe uglify()
+    .pipe gulp.dest('dist/')
 
 gulp.task 'prefixer', ->
+  prefixer = require 'gulp-autoprefixer'
   gulp
   .src 'css/**/*.css', base: 'css/'
   .pipe prefixer()
   .pipe gulp.dest('build/css/')
 
 gulp.task 'cssmin', ->
+  cssmin = require 'gulp-cssmin'
   gulp
   .src 'build/css/main.css'
   .pipe cssmin()
@@ -123,6 +136,7 @@ gulp.task 'cssmin', ->
   .pipe gulp.dest('dist/')
 
 gulp.task 'clean', ->
+  rimraf = require 'gulp-rimraf'
   gulp
   .src ['build/', 'dist/']
   .pipe rimraf()
@@ -137,6 +151,7 @@ gulp.task 'build', ->
     'prefixer', 'cssmin'
 
 gulp.task 'rsync', ->
+  rsync = require('rsyncwrapper').rsync
   rsync
     ssh: yes
     src: '.'
