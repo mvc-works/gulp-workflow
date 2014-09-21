@@ -8,15 +8,11 @@ Gulpfile for personal developing.
 
 This is mainly based on:
 
-* Chrome: debugger JavaScript, and live loading CSS
+* Chrome: live reload CSS/JavaScript
 * Node, Browserify: packing code
 * Gulp: the whole workflow
 * CoffeeScript: no need to say
 * Cirru HTML: I use Cirru instead of Jade, both are simple
-
-To reload Chrome Tabs, use the [extension][reloader].
-
-[reloader]: https://github.com/mvc-works/devtools-reloader-crx
 
 ### Commands
 
@@ -51,11 +47,11 @@ gulp sync
 Filenames are easy to be recognized, here are the folders:
 
 ```sh
-build # temporary compiled code be before built into dist/
-cirru # for building index.html
-coffee # source files
-css # this directory are to be loaded in Chrome workspace
-dist # built resources for deploying
+build/ # temporary compiled code be before built into dist/
+cirru/ # for building index.html
+coffee/ # source files
+css/ # this directory are to be loaded in Chrome workspace
+dist/ # built resources for deploying
 ```
 
 ### License

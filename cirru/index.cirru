@@ -2,14 +2,14 @@ doctype
 
 html
   head
-    title "Simple Chat"
+    title "Workflow"
     meta (:charset utf-8)
     script(:src dist/vendor.min.js)
     @if (@ dev)
       @block
-        link (:rel stylesheet) (:href css/index.css)
+        link (:rel stylesheet) (:href css/main.css)
         script (:defer) (:src build/main.js)
       @block
-        link (:rel stylesheet) (:href dist/index.min.css)
+        link (:rel stylesheet) (:href dist/main.min.css)
         script (:defer) (:src dist/main.min.js)
   body
