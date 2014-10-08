@@ -31,7 +31,7 @@ gulp.task 'watch', ->
 
   watch glob: 'cirru/*', emitOnGlob: no, (files) ->
     gulp
-    .src 'cirru/index/cirru'
+    .src 'cirru/index.cirru'
     .pipe plumber()
     .pipe html(data: {dev: yes})
     .pipe gulp.dest('./')
@@ -120,11 +120,9 @@ gulp.task 'cssmin', ->
   .pipe rename(suffix: '.min')
   .pipe gulp.dest('dist/')
 
-gulp.task 'clean', ->
-  rimraf = require 'gulp-rimraf'
-  gulp
-  .src ['build/', 'dist/']
-  .pipe rimraf()
+gulp.task 'clean', (cb) ->
+  del = require 'del'
+  del ['build/', 'dist/'], cb
 
 gulp.task 'dev', ->
   sequence 'clean', ['html', 'coffee', 'vendor'], 'js'
