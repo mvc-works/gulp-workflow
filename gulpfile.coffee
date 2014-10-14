@@ -1,9 +1,6 @@
 
 gulp = require 'gulp'
-rename = require 'gulp-rename'
-sequence = require 'run-sequence'
 
-project = 'jiyinyiyong/simple-chat/index.html'
 dev = yes
 libraries = [
   'react'
@@ -28,6 +25,7 @@ gulp.task 'watch', ->
   html = require 'gulp-cirru-html'
   transform = require 'vinyl-transform'
   browserify = require 'browserify'
+  rename = require 'gulp-rename'
 
   watch glob: 'cirru/*', emitOnGlob: no, (files) ->
     gulp
@@ -113,10 +111,11 @@ gulp.task 'prefixer', ->
   .pipe gulp.dest('build/css/')
 
 gulp.task 'cssmin', ->
+  rename = require 'gulp-rename'
   cssmin = require 'gulp-cssmin'
   gulp
   .src 'build/css/main.css'
-  .pipe cssmin()
+  .pipe cssmin(root: 'build/css')
   .pipe rename(suffix: '.min')
   .pipe gulp.dest('dist/')
 
@@ -125,10 +124,12 @@ gulp.task 'clean', (cb) ->
   del ['build/', 'dist/'], cb
 
 gulp.task 'dev', ->
+  sequence = require 'run-sequence'
   sequence 'clean', ['html', 'coffee', 'vendor'], 'js'
 
 gulp.task 'build', ->
   dev = no
+  sequence = require 'run-sequence'
   sequence 'clean',
     ['coffee', 'html'], ['jsmin', 'vendor'],
     'prefixer', 'cssmin'
@@ -140,7 +141,7 @@ gulp.task 'rsync', ->
     src: '.'
     recursive: true
     args: ['--verbose']
-    dest: "tiye:~/repo/simple-chat"
+    dest: "tiye:~/repo/noisy-chat"
     deleteAll: yes
     exclude: [
       'bower_components/'

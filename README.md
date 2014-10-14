@@ -2,7 +2,8 @@
 Workflow
 ------
 
-Gulpfile for personal developing.
+Gulpfile for personal developing. More details to be found here:
+https://github.com/mvc-works/workflow
 
 ### Dependencies
 
