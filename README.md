@@ -43,6 +43,16 @@ Upload to server:
 gulp sync
 ```
 
+### Alias
+
+```bash
+alias workflow="
+cp ~/repo/mvc-works/workflow/{.gitignore,gulpfile.coffee,package.json} .;
+mkdir -p source;
+cp ~/repo/mvc-works/workflow/source/index.cirru source/;
+"
+```
+
 ### File structure
 
 Filenames are easy to be recognized, here are the folders:
