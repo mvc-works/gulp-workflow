@@ -7,7 +7,7 @@ libraries = [
   'react'
 ]
 
-gulp.task 'folder', ->
+gulp.task 'folder', (cb) ->
   filetree = require 'make-filetree'
   filetree.make '.',
     source:
@@ -16,6 +16,7 @@ gulp.task 'folder', ->
       'index.cirru': ''
     'README.md': ''
     build: {}
+  cb
 
 gulp.task 'watch', ->
   plumber = require 'gulp-plumber'
@@ -25,7 +26,7 @@ gulp.task 'watch', ->
   transform = require 'vinyl-transform'
   browserify = require 'browserify'
   rename = require 'gulp-rename'
-  reloder = require 'gulp-reloader'
+  reloader = require 'gulp-reloader'
   reloader.listen()
 
   watch glob: 'source/**/*.cirru', emitOnGlob: no, (files) ->
@@ -126,22 +127,22 @@ gulp.task 'clean', (cb) ->
   del = require 'del'
   del ['build/'], cb
 
-gulp.task 'start', ->
+gulp.task 'start', (cb) ->
   sequence = require 'run-sequence'
-  sequence 'clean', 'vendor'
+  sequence 'clean', 'vendor', 'dev', cb
 
 gulp.task 'dev', ->
   sequence = require 'run-sequence'
   sequence ['html', 'coffee'], 'js'
 
-gulp.task 'build', ->
+gulp.task 'build', (cb) ->
   dev = no
   sequence = require 'run-sequence'
   sequence 'clean',
     ['coffee', 'html'], ['jsmin', 'vendor'],
-    'prefixer', 'cssmin'
+    'prefixer', 'cssmin', cb
 
-gulp.task 'rsync', ->
+gulp.task 'rsync', (cb) ->
   rsync = require('rsyncwrapper').rsync
   rsync
     ssh: yes
@@ -167,3 +168,4 @@ gulp.task 'rsync', ->
       console.error stderr
     else
       console.log cmd
+    cb()
