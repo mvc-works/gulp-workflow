@@ -97,14 +97,20 @@ gulp.task 'vendor', ->
   .pipe (if dev then gutil.noop() else uglify())
   .pipe gulp.dest('build/')
 
-gulp.task 'cssmin', ->
+gulp.task 'prefixer', ->
   prefixer = require 'gulp-autoprefixer'
+
+  gulp
+  .src 'src/**/*.css', base: 'src/'
+  .pipe prefixer()
+  .pipe gulp.dest('lib/')
+
+gulp.task 'cssmin', ->
   cssmin = require 'gulp-cssmin'
 
   gulp
-  .src 'src/main.css'
-  .pipe cssmin(root: 'build/css')
-  .pipe prefixer()
+  .src 'lib/main.css'
+  .pipe cssmin(root: 'lib')
   .pipe gulp.dest('build/')
 
 gulp.task 'clean', (cb) ->
@@ -128,7 +134,7 @@ gulp.task 'start', (cb) ->
 
 gulp.task 'dev', ->
   sequence = require 'run-sequence'
-  sequence ['html', 'coffee'], 'browserify'
+  sequence ['html', 'coffee', 'prefixer'], 'browserify'
 
 gulp.task 'build', (cb) ->
   dev = no

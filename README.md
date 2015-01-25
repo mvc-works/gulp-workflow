@@ -51,7 +51,7 @@ Base alias based on my current file structure:
 
 ```bash
 alias workflow="
-cp ~/repo/mvc-works/workflow/{.gitignore,gulpfile.coffee,package.json} ./;
+cp ~/repo/mvc-works/workflow/{.gitignore,.npmignore,gulpfile.coffee,package.json} ./;
 mkdir -p src/;
 cp ~/repo/mvc-works/workflow/index.cirru ./;
 "
@@ -62,11 +62,10 @@ cp ~/repo/mvc-works/workflow/index.cirru ./;
 Filenames are easy to be recognized, here are the folders:
 
 ```sh
-build/ # temporary compiled code be before built into dist/
-cirru/ # for building index.html
-coffee/ # source files
-css/ # this directory are to be loaded in Chrome workspace
-dist/ # built resources for deploying
+build/  # a compiled version of site
+dist/   # built resources for deploying
+src/    # source files in CoffeeScript
+lib/    # compiled JavaScript for npm
 ```
 
 ### License

@@ -1,5 +1,5 @@
 {
-  "name": "street",
+  "name": "workflow",
   "version": "0.2.0",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,6 @@
     "gulp-rename": "^1.2.0",
     "gulp-uglify": "^0.3.1",
     "gulp-util": "^3.0.2",
-    "gulp-wait": "0.0.2",
     "gulp-watch": "^0.6.10",
     "make-filetree": "0.0.2",
     "pages-rev": "0.0.3",
@@ -36,10 +35,10 @@
   "dependencies": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/Memkits/simple-chat.git"
+    "url": "https://github.com/mvc-works/workflow.git"
   },
   "bugs": {
-    "url": "https://github.com/Memkits/simple-chat/issues"
+    "url": "https://github.com/mvc-works/workflow/issues"
   },
-  "homepage": "https://github.com/Memkits/simple-chat"
+  "homepage": "https://github.com/mvc-works/workflow"
 }
