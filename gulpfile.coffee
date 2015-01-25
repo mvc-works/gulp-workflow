@@ -1,8 +1,10 @@
 
 gulp = require 'gulp'
+gutil = require 'gulp-util'
 
 project = 'workflow'
 dev = yes
+prefix = '/mvc-works/workflow/dist/'
 libraries = [
   'react'
 ]
@@ -10,13 +12,14 @@ libraries = [
 gulp.task 'folder', (cb) ->
   filetree = require 'make-filetree'
   filetree.make '.',
-    source:
+    'index.cirru': ''
+    src:
       'main.coffee': ''
       'main.css': ''
-      'index.cirru': ''
+    lib: {}
     'README.md': ''
     build: {}
-  cb
+  cb()
 
 gulp.task 'watch', ->
   plumber = require 'gulp-plumber'
@@ -29,64 +32,55 @@ gulp.task 'watch', ->
   reloader = require 'gulp-reloader'
   reloader.listen()
 
-  watch glob: 'source/**/*.cirru', emitOnGlob: no, (files) ->
-    gulp
-    .src 'source/index.cirru'
-    .pipe plumber()
-    .pipe html(data: {dev: yes})
-    .pipe gulp.dest('./')
-    .pipe reloader(project)
+  gulp
+  .src 'index.cirru'
+  .pipe watch()
+  .pipe plumber()
+  .pipe html(data: {dev: yes})
+  .pipe gulp.dest('./')
+  .pipe reloader(project)
 
-  watch glob: 'source/**/*.coffee', emitOnGlob: no, (files) ->
-    files
-    .pipe plumber()
-    .pipe (coffee bare: yes)
-    .pipe (gulp.dest 'build/js/')
-    .pipe rename('main.js')
-    .pipe transform (filename) ->
-      b = browserify filename, debug: yes
-      b.external library for library in libraries
-      b.bundle()
-    .pipe gulp.dest('build/')
-    .pipe reloader(project)
-    return files
-
-gulp.task 'js', ->
-  browserify = require 'browserify'
-  source = require 'vinyl-source-stream'
-  b = browserify debug: dev
-  b.add './build/js/main'
-  b.external library for library in libraries
-  b.bundle()
-  .pipe source('main.js')
+  gulp
+  .src 'src/**/*.coffee', base: 'src'
+  .pipe watch()
+  .pipe plumber()
+  .pipe (coffee bare: yes)
+  .pipe (gulp.dest 'lib/')
+  .pipe rename('main.js')
+  .pipe transform (filename) ->
+    b = browserify filename, debug: yes
+    b.external library for library in libraries
+    b.bundle()
   .pipe gulp.dest('build/')
+  .pipe reloader(project)
 
 gulp.task 'coffee', ->
   coffee = require 'gulp-coffee'
   gulp
-  .src 'source/**/*.coffee', base: 'source/'
+  .src 'src/**/*.coffee', base: 'src/'
   .pipe (coffee bare: yes)
-  .pipe (gulp.dest 'build/js/')
+  .pipe (gulp.dest 'lib/')
 
 gulp.task 'html', ->
   html = require 'gulp-cirru-html'
   gulp
-  .src 'source/index.cirru'
+  .src 'index.cirru'
   .pipe html(data: {dev: dev})
   .pipe gulp.dest('.')
 
-gulp.task 'jsmin', ->
-  source = require 'vinyl-source-stream'
-  uglify = require 'gulp-uglify'
-  buffer = require 'vinyl-buffer'
+gulp.task 'browserify', ->
   browserify = require 'browserify'
-  b = browserify debug: no
-  b.add './build/js/main'
+  source = require 'vinyl-source-stream'
+  buffer = require 'vinyl-buffer'
+  uglify = require 'gulp-uglify'
+
+  b = browserify debug: dev
+  b.add './lib/main'
   b.external library for library in libraries
-  b.bundle()
-  .pipe source('main.min.js')
-  .pipe buffer()
-  .pipe uglify()
+  jsStream = b.bundle()
+  .pipe source('main.js')
+  .pipe (if dev then gutil.noop() else buffer())
+  .pipe (if dev then gutil.noop() else uglify())
   .pipe gulp.dest('build/')
 
 gulp.task 'vendor', ->
@@ -94,38 +88,39 @@ gulp.task 'vendor', ->
   uglify = require 'gulp-uglify'
   buffer = require 'vinyl-buffer'
   browserify = require 'browserify'
+
   b = browserify debug: no
   b.require library for library in libraries
-  jsbuffer = b.bundle()
-  .pipe source('vendor.min.js')
+  b.bundle()
+  .pipe source('vendor.js')
   .pipe buffer()
-  if dev
-    jsbuffer
-    .pipe gulp.dest('build/')
-  else
-    jsbuffer
-    .pipe uglify()
-    .pipe gulp.dest('build/')
-
-gulp.task 'prefixer', ->
-  prefixer = require 'gulp-autoprefixer'
-  gulp
-  .src 'source/**/*.css', base: 'source/'
-  .pipe prefixer()
-  .pipe gulp.dest('build/css/')
+  .pipe (if dev then gutil.noop() else uglify())
+  .pipe gulp.dest('build/')
 
 gulp.task 'cssmin', ->
-  rename = require 'gulp-rename'
+  prefixer = require 'gulp-autoprefixer'
   cssmin = require 'gulp-cssmin'
+
   gulp
-  .src 'build/css/main.css'
+  .src 'src/main.css'
   .pipe cssmin(root: 'build/css')
-  .pipe rename(suffix: '.min')
+  .pipe prefixer()
   .pipe gulp.dest('build/')
 
 gulp.task 'clean', (cb) ->
   del = require 'del'
-  del ['build/'], cb
+  del ['lib/', 'build/', 'dist/'], cb
+
+gulp.task 'dist', (cb) ->
+  rev = require 'pages-rev'
+
+  rev.run
+    base: "#{__dirname}/"
+    dest: "#{__dirname}/dist/"
+    entries: ['index.html']
+    ignoreDirs: ['node_modules']
+    prefix: prefix
+  cb()
 
 gulp.task 'start', (cb) ->
   sequence = require 'run-sequence'
@@ -133,39 +128,30 @@ gulp.task 'start', (cb) ->
 
 gulp.task 'dev', ->
   sequence = require 'run-sequence'
-  sequence ['html', 'coffee'], 'js'
+  sequence ['html', 'coffee'], 'browserify'
 
 gulp.task 'build', (cb) ->
   dev = no
   sequence = require 'run-sequence'
-  sequence 'clean',
-    ['coffee', 'html'], ['jsmin', 'vendor'],
-    'prefixer', 'cssmin', cb
+  sequence 'start', 'cssmin', cb
 
 gulp.task 'rsync', (cb) ->
   rsync = require('rsyncwrapper').rsync
   rsync
     ssh: yes
-    src: '.'
+    src: 'dist/'
     recursive: true
     args: ['--verbose']
     dest: "tiye:~/repo/#{project}"
     deleteAll: yes
-    exclude: [
-      'node_modules/'
-      'README.md'
-      'data/'
-      'build/js/'
-      'build/css/'
-      '*.json'
-      '.gitignore'
-      '.npmignore'
-      'gulpfile.coffee'
-    ]
+    exclude: []
   , (error, stdout, stderr, cmd) ->
     if error? then throw error
-    if stderr?
-      console.error stderr
-    else
-      console.log cmd
+    if stderr? then console.error stderr
+    else console.log cmd
     cb()
+
+gulp.task 'up', (cb) ->
+  sequence = require 'run-sequence'
+  prefix = '/workflow/'
+  sequence 'dist', 'rsync', cb

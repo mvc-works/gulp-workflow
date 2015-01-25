@@ -1,6 +1,6 @@
 {
   "name": "street",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -20,9 +20,11 @@
     "gulp-reloader": "0.0.1",
     "gulp-rename": "^1.2.0",
     "gulp-uglify": "^0.3.1",
+    "gulp-util": "^3.0.2",
     "gulp-wait": "0.0.2",
-    "gulp-watch": "^0.6.9",
+    "gulp-watch": "^0.6.10",
     "make-filetree": "0.0.2",
+    "pages-rev": "0.0.3",
     "react": "^0.12.*",
     "rsyncwrapper": "^0.4.1",
     "run-sequence": "^0.3.6",

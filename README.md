@@ -27,29 +27,33 @@ gulp folder
 Compile:
 
 ```
-gulp dev
-gulp watch
+gulp start
+gulp dev # quick compile small part of files
+gulp watch # watch compiling
 ```
 
 Build code before deploying:
 
 ```
 gulp build
+gulp dist # with rev
 ```
 
-Upload to server:
+Upload to server with rsync(currently my personal server):
 
 ```
-gulp sync
+gulp up
 ```
 
 ### Alias
 
+Base alias based on my current file structure:
+
 ```bash
 alias workflow="
-cp ~/repo/mvc-works/workflow/{.gitignore,gulpfile.coffee,package.json} .;
-mkdir -p source;
-cp ~/repo/mvc-works/workflow/source/index.cirru source/;
+cp ~/repo/mvc-works/workflow/{.gitignore,gulpfile.coffee,package.json} ./;
+mkdir -p src/;
+cp ~/repo/mvc-works/workflow/index.cirru ./;
 "
 ```
 
